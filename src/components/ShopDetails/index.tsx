@@ -5,58 +5,24 @@ import Image from "next/image";
 import Newsletter from "../Common/Newsletter";
 import RecentlyViewdItems from "./RecentlyViewd";
 import { usePreviewSlider } from "@/app/context/PreviewSliderContext";
-import { useAppSelector } from "@/redux/store";
+import { SupabaseProduct } from "@/types/supabase";
+import { adaptProductWithDetails, adaptProductsForComponents } from "@/lib/adapters/productAdapter";
+import { getProductPreviewUrl, getProductThumbnailUrl } from "@/lib/cloudinary";
 
-const ShopDetails = () => {
-  const [activeColor, setActiveColor] = useState("blue");
+interface ShopDetailsProps {
+  product: SupabaseProduct;
+  relatedProducts: SupabaseProduct[];
+}
+
+const ShopDetails = ({ product: dbProduct, relatedProducts }: ShopDetailsProps) => {
+  const product = adaptProductWithDetails(dbProduct);
+  const [activeColor, setActiveColor] = useState(product.category || "blue");
   const { openPreviewModal } = usePreviewSlider();
   const [previewImg, setPreviewImg] = useState(0);
 
-  const [storage, setStorage] = useState("gb128");
-  const [type, setType] = useState("active");
-  const [sim, setSim] = useState("dual");
   const [quantity, setQuantity] = useState(1);
 
   const [activeTab, setActiveTab] = useState("tabOne");
-
-  const storages = [
-    {
-      id: "gb128",
-      title: "128 GB",
-    },
-    {
-      id: "gb256",
-      title: "256 GB",
-    },
-    {
-      id: "gb512",
-      title: "521 GB",
-    },
-  ];
-
-  const types = [
-    {
-      id: "active",
-      title: "Active",
-    },
-
-    {
-      id: "inactive",
-      title: "Inactive",
-    },
-  ];
-
-  const sims = [
-    {
-      id: "dual",
-      title: "Dual",
-    },
-
-    {
-      id: "e-sim",
-      title: "E Sim",
-    },
-  ];
 
   const tabs = [
     {
@@ -75,16 +41,7 @@ const ShopDetails = () => {
 
   const colors = ["red", "blue", "orange", "pink", "purple"];
 
-  const alreadyExist = localStorage.getItem("productDetails");
-  const productFromStorage = useAppSelector(
-    (state) => state.productDetailsReducer.value
-  );
-
-  const product = alreadyExist ? JSON.parse(alreadyExist) : productFromStorage;
-
-  useEffect(() => {
-    localStorage.setItem("productDetails", JSON.stringify(product));
-  }, [product]);
+  // Removed Redux/Storage logic for product
 
   // pass the product here when you get the real data.
   const handlePreviewSlider = () => {
@@ -129,10 +86,12 @@ const ShopDetails = () => {
 
                       {product.imgs?.previews?.[previewImg] && (
                         <Image
-                          src={product.imgs.previews[previewImg]}
-                          alt="products-details"
+                          src={getProductPreviewUrl(product.imgs.previews[previewImg])}
+                          alt={product.title}
                           width={400}
                           height={400}
+                          className="object-contain"
+                          unoptimized={getProductPreviewUrl(product.imgs.previews[previewImg]).includes('unsplash.com')}
                         />
                       )}
                     </div>
@@ -152,8 +111,10 @@ const ShopDetails = () => {
                         <Image
                           width={50}
                           height={50}
-                          src={item}
+                          src={getProductThumbnailUrl(item)}
                           alt="thumbnail"
+                          className="object-contain"
+                          unoptimized={getProductThumbnailUrl(item).includes('unsplash.com')}
                         />
                       </button>
                     ))}
@@ -315,12 +276,11 @@ const ShopDetails = () => {
                   </div>
 
                   <h3 className="font-medium text-custom-1 mb-4.5">
-                    <span className="text-sm sm:text-base text-dark">
-                      Price: ${product.price}
+                    <span className="text-xl sm:text-2xl text-dark mr-4">
+                      Rs. {product.discountedPrice?.toLocaleString()}
                     </span>
-                    <span className="line-through">
-                      {" "}
-                      ${product.discountedPrice}{" "}
+                    <span className="line-through text-gray-500 text-lg">
+                      Rs. {product.price?.toLocaleString()}
                     </span>
                   </h3>
 
@@ -409,206 +369,7 @@ const ShopDetails = () => {
                         </div>
                       </div>
 
-                      {/* <!-- details item --> */}
-                      <div className="flex items-center gap-4">
-                        <div className="min-w-[65px]">
-                          <h4 className="font-medium text-dark">Storage:</h4>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          {storages.map((item, key) => (
-                            <label
-                              key={key}
-                              htmlFor={item.id}
-                              className="flex cursor-pointer select-none items-center"
-                            >
-                              <div className="relative">
-                                <input
-                                  type="checkbox"
-                                  name="storage"
-                                  id={item.id}
-                                  className="sr-only"
-                                  onChange={() => setStorage(item.id)}
-                                />
-
-                                {/*  */}
-                                <div
-                                  className={`mr-2 flex h-4 w-4 items-center justify-center rounded border ${storage === item.id
-                                    ? "border-blue bg-blue"
-                                    : "border-gray-4"
-                                    } `}
-                                >
-                                  <span
-                                    className={
-                                      storage === item.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    }
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <rect
-                                        x="4"
-                                        y="4.00006"
-                                        width="16"
-                                        height="16"
-                                        rx="4"
-                                        fill="#3C50E0"
-                                      />
-                                      <path
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                        d="M16.3103 9.25104C16.471 9.41178 16.5612 9.62978 16.5612 9.85707C16.5612 10.0844 16.471 10.3024 16.3103 10.4631L12.0243 14.7491C11.8635 14.9098 11.6455 15.0001 11.4182 15.0001C11.191 15.0001 10.973 14.9098 10.8122 14.7491L8.24062 12.1775C8.08448 12.0158 7.99808 11.7993 8.00003 11.5745C8.00199 11.3498 8.09214 11.1348 8.25107 10.9759C8.41 10.8169 8.62499 10.7268 8.84975 10.7248C9.0745 10.7229 9.29103 10.8093 9.4527 10.9654L11.4182 12.931L15.0982 9.25104C15.2589 9.09034 15.4769 9.00006 15.7042 9.00006C15.9315 9.00006 16.1495 9.09034 16.3103 9.25104Z"
-                                        fill="white"
-                                      />
-                                    </svg>
-                                  </span>
-                                </div>
-                              </div>
-                              {item.title}
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* // <!-- details item --> */}
-                      <div className="flex items-center gap-4">
-                        <div className="min-w-[65px]">
-                          <h4 className="font-medium text-dark">Type:</h4>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          {types.map((item, key) => (
-                            <label
-                              key={key}
-                              htmlFor={item.id}
-                              className="flex cursor-pointer select-none items-center"
-                            >
-                              <div className="relative">
-                                <input
-                                  type="checkbox"
-                                  name="storage"
-                                  id={item.id}
-                                  className="sr-only"
-                                  onChange={() => setType(item.id)}
-                                />
-
-                                {/*  */}
-                                <div
-                                  className={`mr-2 flex h-4 w-4 items-center justify-center rounded border ${type === item.id
-                                    ? "border-blue bg-blue"
-                                    : "border-gray-4"
-                                    } `}
-                                >
-                                  <span
-                                    className={
-                                      type === item.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    }
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <rect
-                                        x="4"
-                                        y="4.00006"
-                                        width="16"
-                                        height="16"
-                                        rx="4"
-                                        fill="#3C50E0"
-                                      />
-                                      <path
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                        d="M16.3103 9.25104C16.471 9.41178 16.5612 9.62978 16.5612 9.85707C16.5612 10.0844 16.471 10.3024 16.3103 10.4631L12.0243 14.7491C11.8635 14.9098 11.6455 15.0001 11.4182 15.0001C11.191 15.0001 10.973 14.9098 10.8122 14.7491L8.24062 12.1775C8.08448 12.0158 7.99808 11.7993 8.00003 11.5745C8.00199 11.3498 8.09214 11.1348 8.25107 10.9759C8.41 10.8169 8.62499 10.7268 8.84975 10.7248C9.0745 10.7229 9.29103 10.8093 9.4527 10.9654L11.4182 12.931L15.0982 9.25104C15.2589 9.09034 15.4769 9.00006 15.7042 9.00006C15.9315 9.00006 16.1495 9.09034 16.3103 9.25104Z"
-                                        fill="white"
-                                      />
-                                    </svg>
-                                  </span>
-                                </div>
-                              </div>
-                              {item.title}
-                            </label>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* // <!-- details item --> */}
-                      <div className="flex items-center gap-4">
-                        <div className="min-w-[65px]">
-                          <h4 className="font-medium text-dark">Sim:</h4>
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                          {sims.map((item, key) => (
-                            <label
-                              key={key}
-                              htmlFor={item.id}
-                              className="flex cursor-pointer select-none items-center"
-                            >
-                              <div className="relative">
-                                <input
-                                  type="checkbox"
-                                  name="storage"
-                                  id={item.id}
-                                  className="sr-only"
-                                  onChange={() => setSim(item.id)}
-                                />
-
-                                {/*  */}
-                                <div
-                                  className={`mr-2 flex h-4 w-4 items-center justify-center rounded border ${sim === item.id
-                                    ? "border-blue bg-blue"
-                                    : "border-gray-4"
-                                    } `}
-                                >
-                                  <span
-                                    className={
-                                      sim === item.id
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    }
-                                  >
-                                    <svg
-                                      width="24"
-                                      height="24"
-                                      viewBox="0 0 24 24"
-                                      fill="none"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                      <rect
-                                        x="4"
-                                        y="4.00006"
-                                        width="16"
-                                        height="16"
-                                        rx="4"
-                                        fill="#3C50E0"
-                                      />
-                                      <path
-                                        fillRule="evenodd"
-                                        clipRule="evenodd"
-                                        d="M16.3103 9.25104C16.471 9.41178 16.5612 9.62978 16.5612 9.85707C16.5612 10.0844 16.471 10.3024 16.3103 10.4631L12.0243 14.7491C11.8635 14.9098 11.6455 15.0001 11.4182 15.0001C11.191 15.0001 10.973 14.9098 10.8122 14.7491L8.24062 12.1775C8.08448 12.0158 7.99808 11.7993 8.00003 11.5745C8.00199 11.3498 8.09214 11.1348 8.25107 10.9759C8.41 10.8169 8.62499 10.7268 8.84975 10.7248C9.0745 10.7229 9.29103 10.8093 9.4527 10.9654L11.4182 12.931L15.0982 9.25104C15.2589 9.09034 15.4769 9.00006 15.7042 9.00006C15.9315 9.00006 16.1495 9.09034 16.3103 9.25104Z"
-                                        fill="white"
-                                      />
-                                    </svg>
-                                  </span>
-                                </div>
-                              </div>
-                              {item.title}
-                            </label>
-                          ))}
-                        </div>
-                      </div>
+                      {/* Bag specific details could go here */}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4.5">
@@ -1435,7 +1196,7 @@ const ShopDetails = () => {
             </div>
           </section>
 
-          <RecentlyViewdItems />
+          <RecentlyViewdItems products={adaptProductsForComponents(relatedProducts)} />
 
           <Newsletter />
         </>

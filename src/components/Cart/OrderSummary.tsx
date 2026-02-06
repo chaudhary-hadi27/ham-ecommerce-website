@@ -34,7 +34,7 @@ const OrderSummary = () => {
               </div>
               <div>
                 <p className="text-dark text-right">
-                  ${item.discountedPrice * item.quantity}
+                  Rs. {(item.discountedPrice * item.quantity).toLocaleString()}
                 </p>
               </div>
             </div>
@@ -46,8 +46,8 @@ const OrderSummary = () => {
               <p className="font-medium text-lg text-dark">Total</p>
             </div>
             <div>
-              <p className="font-medium text-lg text-dark text-right">
-                ${totalPrice}
+              <p className="font-medium text-lg text-dark text-right font-semibold text-blue">
+                Rs. {totalPrice.toLocaleString()}
               </p>
             </div>
           </div>

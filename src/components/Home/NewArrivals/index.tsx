@@ -1,10 +1,13 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import ProductItem from "@/components/Common/ProductItem";
-import shopData from "@/components/Shop/shopData";
+import { Product } from "@/types/product";
 
-const NewArrival = () => {
+interface NewArrivalProps {
+  products: Product[];
+}
+
+const NewArrival = ({ products }: NewArrivalProps) => {
   return (
     <section className="overflow-hidden pt-15">
       <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -12,6 +15,7 @@ const NewArrival = () => {
         <div className="mb-7 flex items-center justify-between">
           <div>
             <span className="flex items-center gap-2.5 font-medium text-dark mb-1.5">
+              {/* SVG omitted for brevity */}
               <svg
                 width="20"
                 height="20"
@@ -48,7 +52,7 @@ const NewArrival = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-7.5 gap-y-9">
           {/* <!-- New Arrivals item --> */}
-          {shopData.map((item, key) => (
+          {products.slice(0, 4).map((item, key) => (
             <ProductItem item={item} key={key} />
           ))}
         </div>

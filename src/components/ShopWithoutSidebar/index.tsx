@@ -7,9 +7,19 @@ import SingleListItem from "../Shop/SingleListItem";
 import CustomSelect from "../ShopWithSidebar/CustomSelect";
 
 import shopData from "../Shop/shopData";
+import { SupabaseProduct, Category } from "@/types/supabase";
 
-const ShopWithoutSidebar = () => {
+interface ShopWithoutSidebarProps {
+  products?: SupabaseProduct[];
+  categories?: Category[];
+  currentFilters?: any;
+}
+
+const ShopWithoutSidebar = ({ products, categories, currentFilters }: ShopWithoutSidebarProps) => {
   const [productStyle, setProductStyle] = useState("grid");
+
+  // Use dynamic products if available, otherwise fall back to static data
+  const displayProducts = products && products.length > 0 ? products : shopData;
 
   const options = [
     { label: "Latest Products", value: "0" },
@@ -35,7 +45,7 @@ const ShopWithoutSidebar = () => {
                     <CustomSelect options={options} />
 
                     <p>
-                      Showing <span className="text-dark">9 of 50</span>{" "}
+                      Showing <span className="text-dark">{displayProducts.length}</span>{" "}
                       Products
                     </p>
                   </div>
@@ -45,11 +55,10 @@ const ShopWithoutSidebar = () => {
                     <button
                       onClick={() => setProductStyle("grid")}
                       aria-label="button for product grid tab"
-                      className={`${
-                        productStyle === "grid"
-                          ? "bg-blue border-blue text-white"
-                          : "text-dark bg-gray-1 border-gray-3"
-                      } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
+                      className={`${productStyle === "grid"
+                        ? "bg-blue border-blue text-white"
+                        : "text-dark bg-gray-1 border-gray-3"
+                        } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
                     >
                       <svg
                         className="fill-current"
@@ -89,11 +98,10 @@ const ShopWithoutSidebar = () => {
                     <button
                       onClick={() => setProductStyle("list")}
                       aria-label="button for product list tab"
-                      className={`${
-                        productStyle === "list"
-                          ? "bg-blue border-blue text-white"
-                          : "text-dark bg-gray-1 border-gray-3"
-                      } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
+                      className={`${productStyle === "list"
+                        ? "bg-blue border-blue text-white"
+                        : "text-dark bg-gray-1 border-gray-3"
+                        } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
                     >
                       <svg
                         className="fill-current"
@@ -123,13 +131,12 @@ const ShopWithoutSidebar = () => {
 
               {/* <!-- Products Grid Tab Content Start --> */}
               <div
-                className={`${
-                  productStyle === "grid"
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-7.5 gap-y-9"
-                    : "flex flex-col gap-7.5"
-                }`}
+                className={`${productStyle === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-7.5 gap-y-9"
+                  : "flex flex-col gap-7.5"
+                  }`}
               >
-                {shopData.map((item, key) =>
+                {displayProducts.map((item, key) =>
                   productStyle === "grid" ? (
                     <SingleGridItem item={item} key={key} />
                   ) : (

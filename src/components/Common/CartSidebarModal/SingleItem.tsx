@@ -2,6 +2,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import Image from "next/image";
+import { getProductThumbnailUrl } from "@/lib/cloudinary";
 
 const SingleItem = ({ item, removeItemFromCart }) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -13,15 +14,15 @@ const SingleItem = ({ item, removeItemFromCart }) => {
   return (
     <div className="flex items-center justify-between gap-5">
       <div className="w-full flex items-center gap-6">
-        <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5">
-          <Image src={item.imgs?.thumbnails[0]} alt="product" width={100} height={100} />
+        <div className="flex items-center justify-center rounded-[10px] bg-gray-3 max-w-[90px] w-full h-22.5 overflow-hidden">
+          <Image src={getProductThumbnailUrl(item.imgs?.thumbnails?.[0] || '/images/products/product-placeholder.png')} alt={item.title} width={90} height={90} className="object-contain" />
         </div>
 
         <div>
           <h3 className="font-medium text-dark mb-1 ease-out duration-200 hover:text-blue">
             <a href="#"> {item.title} </a>
           </h3>
-          <p className="text-custom-sm">Price: ${item.discountedPrice}</p>
+          <p className="text-custom-sm">Price: Rs. {item.discountedPrice.toLocaleString()}</p>
         </div>
       </div>
 

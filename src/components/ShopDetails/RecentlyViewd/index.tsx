@@ -1,17 +1,19 @@
 "use client";
-import React from "react";
-import shopData from "@/components/Shop/shopData";
+import React, { useCallback, useRef } from "react";
 import ProductItem from "@/components/Common/ProductItem";
+import { Product } from "@/types/product";
 import Image from "next/image";
-import Link from "next/link";
-
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useCallback, useRef } from "react";
+
 import "swiper/css/navigation";
 import "swiper/css";
 
-const RecentlyViewdItems = () => {
-  const sliderRef = useRef(null);
+interface RecentlyViewedProps {
+  products: Product[];
+}
+
+const RecentlyViewdItems = ({ products }: RecentlyViewedProps) => {
+  const sliderRef = useRef<any>(null);
 
   const handlePrev = useCallback(() => {
     if (!sliderRef.current) return;
@@ -22,6 +24,8 @@ const RecentlyViewdItems = () => {
     if (!sliderRef.current) return;
     sliderRef.current.swiper.slideNext();
   }, []);
+
+  if (!products || products.length === 0) return null;
 
   return (
     <section className="overflow-hidden pt-17.5">
@@ -37,10 +41,10 @@ const RecentlyViewdItems = () => {
                   height={17}
                   alt="icon"
                 />
-                Categories
+                Related Products
               </span>
               <h2 className="font-semibold text-xl xl:text-heading-5 text-dark">
-                Browse by Category
+                You May Also Like
               </h2>
             </div>
 
@@ -84,12 +88,17 @@ const RecentlyViewdItems = () => {
           </div>
 
           <Swiper
-            ref={sliderRef}
-            slidesPerView={4}
+            onSwiper={(swiper) => (sliderRef.current = { swiper })}
+            slidesPerView={1}
             spaceBetween={20}
+            breakpoints={{
+              640: { slidesPerView: 2 },
+              768: { slidesPerView: 3 },
+              1024: { slidesPerView: 4 },
+            }}
             className="justify-between"
           >
-            {shopData.map((item, key) => (
+            {products.map((item, key) => (
               <SwiperSlide key={key}>
                 <ProductItem item={item} />
               </SwiperSlide>

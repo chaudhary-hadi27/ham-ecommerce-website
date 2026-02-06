@@ -9,7 +9,13 @@ import "swiper/css/navigation";
 import "swiper/css";
 import SingleItem from "./SingleItem";
 
-const Categories = () => {
+import { Category } from "@/types/supabase";
+
+interface CategoriesProps {
+  categories: Category[];
+}
+
+const Categories = ({ categories }: CategoriesProps) => {
   const sliderRef = useRef(null);
 
   const handlePrev = useCallback(() => {
@@ -134,7 +140,7 @@ const Categories = () => {
               },
             }}
           >
-            {data.map((item, key) => (
+            {categories.map((item, key) => (
               <SwiperSlide key={key}>
                 <SingleItem item={item} />
               </SwiperSlide>

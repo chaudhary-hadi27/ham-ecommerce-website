@@ -9,6 +9,7 @@ import Image from "next/image";
 import { usePreviewSlider } from "@/app/context/PreviewSliderContext";
 import { resetQuickView } from "@/redux/features/quickView-slice";
 import { updateproductDetails } from "@/redux/features/product-details";
+import { getProductPreviewUrl, getProductThumbnailUrl } from "@/lib/cloudinary";
 
 const QuickViewModal = () => {
   const { isModalOpen, closeModal } = useModalContext();
@@ -101,11 +102,11 @@ const QuickViewModal = () => {
                         }`}
                     >
                       <Image
-                        src={img || ""}
+                        src={getProductThumbnailUrl(img || '/images/products/product-placeholder.png')}
                         alt="thumbnail"
-                        width={61}
-                        height={61}
-                        className="aspect-square"
+                        width={80}
+                        height={80}
+                        className="aspect-square object-contain"
                       />
                     </button>
                   ))}
@@ -137,10 +138,11 @@ const QuickViewModal = () => {
 
                     {product?.imgs?.previews?.[activePreview] && (
                       <Image
-                        src={product.imgs.previews[activePreview]}
+                        src={getProductPreviewUrl(product.imgs.previews[activePreview])}
                         alt="products-details"
-                        width={400}
-                        height={400}
+                        width={500}
+                        height={500}
+                        className="object-contain"
                       />
                     )}
                   </div>
@@ -315,10 +317,10 @@ const QuickViewModal = () => {
 
                   <span className="flex items-center gap-2">
                     <span className="font-semibold text-dark text-xl xl:text-heading-4">
-                      ${product.discountedPrice}
+                      Rs. {product.discountedPrice.toLocaleString()}
                     </span>
                     <span className="font-medium text-dark-4 text-lg xl:text-2xl line-through">
-                      ${product.price}
+                      Rs. {product.price.toLocaleString()}
                     </span>
                   </span>
                 </div>

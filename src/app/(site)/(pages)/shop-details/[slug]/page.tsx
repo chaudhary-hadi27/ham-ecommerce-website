@@ -8,13 +8,14 @@ import { getProductBySlug, getRelatedProducts } from "@/lib/api/products";
 import { notFound } from "next/navigation";
 
 interface Props {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const product = await getProductBySlug(params.slug);
+    const { slug } = await params;
+    const product = await getProductBySlug(slug);
 
     if (!product) {
         return {
@@ -32,7 +33,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ShopDetailsPage({ params }: Props) {
-    const product = await getProductBySlug(params.slug);
+    const { slug } = await params;
+    const product = await getProductBySlug(slug);
 
     if (!product) {
         notFound();

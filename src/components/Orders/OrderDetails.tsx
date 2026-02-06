@@ -42,15 +42,14 @@ const OrderDetails = ({ orderItem }: any) => {
 
         <div className="min-w-[128px]">
           <p
-            className={`inline-block text-custom-sm  py-0.5 px-2.5 rounded-[30px] capitalize ${
-              orderItem.status === "delivered"
+            className={`inline-block text-custom-sm  py-0.5 px-2.5 rounded-[30px] capitalize ${orderItem.status === "delivered"
                 ? "text-green bg-green-light-6"
                 : orderItem.status === "on-hold"
-                ? "text-red bg-red-light-6"
-                : orderItem.status === "processing"
-                ? "text-yellow bg-yellow-light-4"
-                : "Unknown Status"
-            }`}
+                  ? "text-red bg-red-light-6"
+                  : orderItem.status === "processing"
+                    ? "text-yellow bg-yellow-light-4"
+                    : "Unknown Status"
+              }`}
           >
             {orderItem.status}
           </p>
@@ -61,14 +60,14 @@ const OrderDetails = ({ orderItem }: any) => {
         </div> */}
 
         <div className="min-w-[113px]">
-          <p className="text-custom-sm text-dark">
-            {orderItem.total}
+          <p className="text-custom-sm text-dark font-medium">
+            Rs. {orderItem.total.toLocaleString()}
           </p>
         </div>
       </div>
       <div className="px-7.5 w-full">
         <p className="font-bold">Shipping Address:</p>{" "}
-        <p>942 Aspen Road Encino, CA 91316</p>
+        <p>Plot 42, Sector 5, DHA Phase 6, Karachi, Pakistan</p>
       </div>
     </>
   );

@@ -2,7 +2,7 @@
 
 ## 📊 Project Overview
 **Goal:** Convert static NextCommerce template → Dynamic HAM Bags E-commerce with Admin Panel
-**Tech Stack:** Next.js 14, Supabase (DB + Auth), Cloudinary (Images), Tailwind CSS
+**Tech Stack:** Next.js 16, Supabase (DB + Auth), Cloudinary (Images), Tailwind CSS
 **Domain:** hum.com.pk
 
 ---

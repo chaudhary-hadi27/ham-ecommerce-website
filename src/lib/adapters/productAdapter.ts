@@ -15,6 +15,7 @@ export function adaptProductForComponent(dbProduct: SupabaseProduct): Product {
         reviews: dbProduct.reviews,
         price: dbProduct.price,
         discountedPrice: dbProduct.discounted_price || dbProduct.price,
+        slug: dbProduct.slug,
         imgs: {
             thumbnails: dbProduct.images,
             previews: dbProduct.images,

@@ -1,12 +1,22 @@
-import { Category } from "@/types/category";
+import { Category } from "@/types/supabase";
 import React from "react";
 import Image from "next/image";
+import { getOptimizedImageUrl } from "@/lib/cloudinary";
 
 const SingleItem = ({ item }: { item: Category }) => {
+  const imageUrl = item.image || '/images/categories/category-placeholder.png';
+  const optimizedImageUrl = getOptimizedImageUrl(imageUrl, { width: 130, height: 130 });
+
   return (
-    <a href="#" className="group flex flex-col items-center">
-      <div className="max-w-[130px] w-full bg-[#F2F3F8] h-32.5 rounded-full flex items-center justify-center mb-4">
-        <Image src={item.img} alt="Category" width={82} height={62} />
+    <a href={`/shop-with-sidebar?category=${item.slug}`} className="group flex flex-col items-center">
+      <div className="max-w-[130px] w-full bg-[#F2F3F8] h-32.5 rounded-full flex items-center justify-center mb-4 overflow-hidden">
+        <Image
+          src={optimizedImageUrl}
+          alt={item.title}
+          width={130}
+          height={130}
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+        />
       </div>
 
       <div className="flex justify-center">

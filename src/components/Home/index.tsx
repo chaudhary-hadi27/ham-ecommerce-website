@@ -8,14 +8,22 @@ import CounDown from "./Countdown";
 import Testimonials from "./Testimonials";
 import Newsletter from "../Common/Newsletter";
 
-const Home = () => {
+import { Product } from "@/types/product";
+import { Category } from "@/types/supabase";
+
+interface HomeProps {
+  products: Product[];
+  categories: Category[];
+}
+
+const Home = ({ products, categories }: HomeProps) => {
   return (
     <main>
       <Hero />
-      <Categories />
-      <NewArrival />
+      <Categories categories={categories} />
+      <NewArrival products={products} />
       <PromoBanner />
-      <BestSeller />
+      <BestSeller products={products} />
       <CounDown />
       <Testimonials />
       <Newsletter />

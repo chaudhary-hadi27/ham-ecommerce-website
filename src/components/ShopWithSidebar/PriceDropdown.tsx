@@ -1,14 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const PriceDropdown = () => {
   const [toggleDropdown, setToggleDropdown] = useState(true);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
+  // Initial state from URL or defaults
   const [selectedPrice, setSelectedPrice] = useState({
-    from: 0,
-    to: 100,
+    from: Number(searchParams.get('minPrice')) || 0,
+    to: Number(searchParams.get('maxPrice')) || 10000,
   });
+
+  // Debounce effect to update URL
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const current = new URLSearchParams(Array.from(searchParams.entries()));
+
+      if (selectedPrice.from > 0) {
+        current.set('minPrice', selectedPrice.from.toString());
+      } else {
+        current.delete('minPrice');
+      }
+
+      if (selectedPrice.to < 10000) {
+        current.set('maxPrice', selectedPrice.to.toString());
+      } else {
+        current.delete('maxPrice');
+      }
+
+      const search = current.toString();
+      const query = search ? `?${search}` : "";
+
+      // Only push if changed to avoid loop/spam, though Next.js router usually handles it well
+      // But here we just want to push when values change after delay
+      router.push(`/shop-with-sidebar${query}`, { scroll: false });
+    }, 500); // 500ms delay
+
+    return () => clearTimeout(timer);
+  }, [selectedPrice, useRouter]); // Only run when selectedPrice changes
 
   return (
     <div className="bg-white shadow-1 rounded-lg">
@@ -16,14 +48,16 @@ const PriceDropdown = () => {
         onClick={() => setToggleDropdown(!toggleDropdown)}
         className="cursor-pointer flex items-center justify-between py-3 pl-6 pr-5.5"
       >
-        <p className="text-dark">Price</p>
+        <p className="text-dark">Price (PKR)</p>
         <button
-          onClick={() => setToggleDropdown(!toggleDropdown)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setToggleDropdown(!toggleDropdown);
+          }}
           id="price-dropdown-btn"
           aria-label="button for price dropdown"
-          className={`text-dark ease-out duration-200 ${
-            toggleDropdown && 'rotate-180'
-          }`}
+          className={`text-dark ease-out duration-200 ${toggleDropdown && 'rotate-180'
+            }`}
         >
           <svg
             className="fill-current"
@@ -50,7 +84,9 @@ const PriceDropdown = () => {
             <RangeSlider
               id="range-slider-gradient"
               className="margin-lg"
-              step={'any'}
+              min={0}
+              max={10000}
+              defaultValue={[selectedPrice.from, selectedPrice.to]}
               onInput={(e) =>
                 setSelectedPrice({
                   from: Math.floor(e[0]),
@@ -62,7 +98,7 @@ const PriceDropdown = () => {
             <div className="price-amount flex items-center justify-between pt-4">
               <div className="text-custom-xs text-dark-4 flex rounded border border-gray-3/80">
                 <span className="block border-r border-gray-3/80 px-2.5 py-1.5">
-                  $
+                  Rs.
                 </span>
                 <span id="minAmount" className="block px-3 py-1.5">
                   {selectedPrice.from}
@@ -71,7 +107,7 @@ const PriceDropdown = () => {
 
               <div className="text-custom-xs text-dark-4 flex rounded border border-gray-3/80">
                 <span className="block border-r border-gray-3/80 px-2.5 py-1.5">
-                  $
+                  Rs.
                 </span>
                 <span id="maxAmount" className="block px-3 py-1.5">
                   {selectedPrice.to}

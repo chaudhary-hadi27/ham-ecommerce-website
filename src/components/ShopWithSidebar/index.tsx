@@ -3,18 +3,31 @@ import React, { useState, useEffect } from "react";
 import Breadcrumb from "../Common/Breadcrumb";
 import CustomSelect from "./CustomSelect";
 import CategoryDropdown from "./CategoryDropdown";
-import GenderDropdown from "./GenderDropdown";
-import SizeDropdown from "./SizeDropdown";
-import ColorsDropdwon from "./ColorsDropdwon";
 import PriceDropdown from "./PriceDropdown";
 import shopData from "../Shop/shopData";
 import SingleGridItem from "../Shop/SingleGridItem";
 import SingleListItem from "../Shop/SingleListItem";
 
-const ShopWithSidebar = () => {
+import { Product } from "@/types/product";
+import { Category } from "@/types/supabase";
+
+interface ShopWithSidebarProps {
+  initialProducts: Product[];
+  categories: Category[];
+}
+
+const ShopWithSidebar = ({ initialProducts, categories: dbCategories }: ShopWithSidebarProps) => {
   const [productStyle, setProductStyle] = useState("grid");
   const [productSidebar, setProductSidebar] = useState(false);
   const [stickyMenu, setStickyMenu] = useState(false);
+
+  // Map Supabase categories to the format expected by CategoryDropdown or update CategoryDropdown
+  const categories = dbCategories.map(cat => ({
+    name: cat.title,
+    slug: cat.slug,
+    products: 0, // We can calculate this or just hide it
+    isRefined: false,
+  }));
 
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
@@ -30,53 +43,7 @@ const ShopWithSidebar = () => {
     { label: "Old Products", value: "2" },
   ];
 
-  const categories = [
-    {
-      name: "Desktop",
-      products: 10,
-      isRefined: true,
-    },
-    {
-      name: "Laptop",
-      products: 12,
-      isRefined: false,
-    },
-    {
-      name: "Monitor",
-      products: 30,
-      isRefined: false,
-    },
-    {
-      name: "UPS",
-      products: 23,
-      isRefined: false,
-    },
-    {
-      name: "Phone",
-      products: 10,
-      isRefined: false,
-    },
-    {
-      name: "Watch",
-      products: 13,
-      isRefined: false,
-    },
-  ];
 
-  const genders = [
-    {
-      name: "Men",
-      products: 10,
-    },
-    {
-      name: "Women",
-      products: 23,
-    },
-    {
-      name: "Unisex",
-      products: 8,
-    },
-  ];
 
   useEffect(() => {
     window.addEventListener("scroll", handleStickyMenu);
@@ -108,20 +75,18 @@ const ShopWithSidebar = () => {
           <div className="flex gap-7.5">
             {/* <!-- Sidebar Start --> */}
             <div
-              className={`sidebar-content fixed xl:z-1 z-9999 left-0 top-0 xl:translate-x-0 xl:static max-w-[310px] xl:max-w-[270px] w-full ease-out duration-200 ${
-                productSidebar
-                  ? "translate-x-0 bg-white p-5 h-screen overflow-y-auto"
-                  : "-translate-x-full"
-              }`}
+              className={`sidebar-content fixed xl:z-1 z-9999 left-0 top-0 xl:translate-x-0 xl:static max-w-[310px] xl:max-w-[270px] w-full ease-out duration-200 ${productSidebar
+                ? "translate-x-0 bg-white p-5 h-screen overflow-y-auto"
+                : "-translate-x-full"
+                }`}
             >
               <button
                 onClick={() => setProductSidebar(!productSidebar)}
                 aria-label="button for product sidebar toggle"
-                className={`xl:hidden absolute -right-12.5 sm:-right-8 flex items-center justify-center w-8 h-8 rounded-md bg-white shadow-1 ${
-                  stickyMenu
-                    ? "lg:top-20 sm:top-34.5 top-35"
-                    : "lg:top-24 sm:top-39 top-37"
-                }`}
+                className={`xl:hidden absolute -right-12.5 sm:-right-8 flex items-center justify-center w-8 h-8 rounded-md bg-white shadow-1 ${stickyMenu
+                  ? "lg:top-20 sm:top-34.5 top-35"
+                  : "lg:top-24 sm:top-39 top-37"
+                  }`}
               >
                 <svg
                   className="fill-current"
@@ -152,23 +117,21 @@ const ShopWithSidebar = () => {
                   <div className="bg-white shadow-1 rounded-lg py-4 px-5">
                     <div className="flex items-center justify-between">
                       <p>Filters:</p>
-                      <button className="text-blue">Clean All</button>
+                      <button
+                        className="text-blue"
+                        onClick={() => {
+                          window.location.href = '/shop-with-sidebar';
+                        }}
+                      >
+                        Clean All
+                      </button>
                     </div>
                   </div>
 
                   {/* <!-- category box --> */}
                   <CategoryDropdown categories={categories} />
 
-                  {/* <!-- gender box --> */}
-                  <GenderDropdown genders={genders} />
-
-                  {/* // <!-- size box --> */}
-                  <SizeDropdown />
-
-                  {/* // <!-- color box --> */}
-                  <ColorsDropdwon />
-
-                  {/* // <!-- price range box --> */}
+                  {/* <!-- price range box --> */}
                   <PriceDropdown />
                 </div>
               </form>
@@ -184,7 +147,7 @@ const ShopWithSidebar = () => {
                     <CustomSelect options={options} />
 
                     <p>
-                      Showing <span className="text-dark">9 of 50</span>{" "}
+                      Showing <span className="text-dark">{initialProducts.length} of {initialProducts.length}</span>{" "}
                       Products
                     </p>
                   </div>
@@ -194,11 +157,10 @@ const ShopWithSidebar = () => {
                     <button
                       onClick={() => setProductStyle("grid")}
                       aria-label="button for product grid tab"
-                      className={`${
-                        productStyle === "grid"
-                          ? "bg-blue border-blue text-white"
-                          : "text-dark bg-gray-1 border-gray-3"
-                      } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
+                      className={`${productStyle === "grid"
+                        ? "bg-blue border-blue text-white"
+                        : "text-dark bg-gray-1 border-gray-3"
+                        } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
                     >
                       <svg
                         className="fill-current"
@@ -238,11 +200,10 @@ const ShopWithSidebar = () => {
                     <button
                       onClick={() => setProductStyle("list")}
                       aria-label="button for product list tab"
-                      className={`${
-                        productStyle === "list"
-                          ? "bg-blue border-blue text-white"
-                          : "text-dark bg-gray-1 border-gray-3"
-                      } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
+                      className={`${productStyle === "list"
+                        ? "bg-blue border-blue text-white"
+                        : "text-dark bg-gray-1 border-gray-3"
+                        } flex items-center justify-center w-10.5 h-9 rounded-[5px] border ease-out duration-200 hover:bg-blue hover:border-blue hover:text-white`}
                     >
                       <svg
                         className="fill-current"
@@ -272,13 +233,12 @@ const ShopWithSidebar = () => {
 
               {/* <!-- Products Grid Tab Content Start --> */}
               <div
-                className={`${
-                  productStyle === "grid"
-                    ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-7.5 gap-y-9"
-                    : "flex flex-col gap-7.5"
-                }`}
+                className={`${productStyle === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-7.5 gap-y-9"
+                  : "flex flex-col gap-7.5"
+                  }`}
               >
-                {shopData.map((item, key) =>
+                {initialProducts.map((item, key) =>
                   productStyle === "grid" ? (
                     <SingleGridItem item={item} key={key} />
                   ) : (
